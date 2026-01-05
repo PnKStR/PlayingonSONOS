@@ -1,0 +1,9 @@
+{
+  "server": "http://192.168.1.43:5005/",
+  "rooms": [
+    "badezimmer"
+  ],
+  "debug": true,
+  "display_width": 720,
+  "display_height": 720
+}
