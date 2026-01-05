@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ appinfo.app_name }}</title>
+
+    <style>
+        body {
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+
+            width: {{ display_width }}px;
+            height: {{ display_height }}px;
+            margin-left: auto;
+            margin-right: auto;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 30px;
+        }
+
+        .content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .room-frame {
+            border: 2px solid #444;
+            border-radius: 15px;
+            padding: 15px;
+            width: calc({{ display_width }}px - 60px);
+            margin: 0 auto;
+            margin-top: 5px;
+        }
+
+        .room h2 {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        img.cover {
+            width: {{ cover_size }}px;
+            height: {{ cover_size }}px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .button {
+            padding: 10px 18px;
+            background: #444;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 20px;
+            min-width: 110px;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 18px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #00ff66;
+            width: 0%;
+            transition: width 0.3s linear;
+        }
+
+        /* Neuer lokaler Footer direkt unter dem Rahmen */
+        .local-footer {
+            padding: 0 10px 5px 10px;
+            font-size: 12px;
+            color: #888;
+            text-align: right;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>{{ appinfo.app_name }}</h1>
+
+<div class="content">
+
+{% for room in rooms %}
+<div class="room-frame">
+    <div class="room">
+
+        <h2 id="roomname">{{ room.room }}</h2>
+
+        <img id="cover" class="cover" src="{{ room.album_art }}" alt="Cover">
+
+        <h3 id="title">{{ room.title }}</h3>
+        <h4 id="artist">{{ room.artist }}</h4>
+
+        <div class="control-row">
+
+            <a id="togglebtn" class="button" href="/toggle/{{ room.room }}">
+                {% if room.state == "PLAYING" %}
+                    Pause
+                {% else %}
+                    Play
+                {% endif %}
+            </a>
+
+            <div class="progress-container">
+                <div id="progress" class="progress-bar"
+                     style="width: {{ (room.position / room.duration * 100) if room.duration > 0 else 0 }}%">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endfor %}
+
+<!-- Footer jetzt direkt unter dem Rahmen -->
+<footer class="local-footer">
+    Version {{ appinfo.version }} — © {{ appinfo.author }}
+</footer>
+
+</div>
+
+<script>
+async function updateData() {
+    try {
+        const response = await fetch("/api/state");
+        const rooms = await response.json();
+        const room = rooms[0];
+
+        document.getElementById("roomname").innerText = room.room;
+        document.getElementById("title").innerText = room.title;
+        document.getElementById("artist").innerText = room.artist;
+        document.getElementById("cover").src = room.album_art;
+
+        const pct = room.duration > 0 ? (room.position / room.duration * 100) : 0;
+        document.getElementById("progress").style.width = pct + "%";
+
+        document.getElementById("togglebtn").innerText =
+            room.state === "PLAYING" ? "Pause" : "Play";
+
+    } catch (e) {
+        console.log("Update error:", e);
+    }
+}
+
+setInterval(updateData, 1000);
+</script>
+
+</body>
+</html>
