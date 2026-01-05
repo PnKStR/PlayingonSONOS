@@ -77,25 +77,27 @@
         }
 
         .button {
-            padding: 10px 10px;
+            padding: 10px 18px;
             background: #444;
             color: white;
             border-radius: 10px;
             text-decoration: none;
             font-size: 20px;
-            min-width: 80px;
+            min-width: 10px;
         }
 
         .button.small {
             padding: 8px 14px;
             font-size: 20px;
-            min-width: 50px;
+            min-width: 10px;
             text-align: center;
         }
 
         .progress-container {
-            flex: 1;
+            width: 100%;
+            max-width: calc({{ display_width }}px - 90px);
             height: 18px;
+            margin: 0 auto;
             background: #333;
             border-radius: 10px;
             overflow: hidden;
@@ -138,8 +140,20 @@
         <h3 id="title">{{ room.title }}</h3>
         <h4 id="artist">{{ room.artist }}</h4>
 
-        <!-- Zeile 1: Play/Pause + Progressbar -->
+        <!-- Zeile 1: Nur Statusbar -->
         <div class="control-row">
+            <div class="progress-container">
+                <div id="progress" class="progress-bar"
+                     style="width: {{ (room.position / room.duration * 100) if room.duration > 0 else 0 }}%">
+                </div>
+            </div>
+        </div>
+
+        <!-- Zeile 2: - << Play/Pause >> + -->
+        <div class="control-row">
+            <a class="button small" href="/volume_down/{{ room.room }}">−</a>
+            <a class="button small" href="/previous/{{ room.room }}">«</a>
+
             <a id="togglebtn" class="button small" href="/toggle/{{ room.room }}">
                 {% if room.state == "PLAYING" %}
                     Pause
@@ -148,17 +162,6 @@
                 {% endif %}
             </a>
 
-            <div class="progress-container">
-                <div id="progress" class="progress-bar"
-                     style="width: {{ (room.position / room.duration * 100) if room.duration > 0 else 0 }}%">
-                </div>
-            </div>
-        </div>
-
-        <!-- Zeile 2: − « » + -->
-        <div class="control-row">
-            <a class="button small" href="/volume_down/{{ room.room }}">−</a>
-            <a class="button small" href="/previous/{{ room.room }}">«</a>
             <a class="button small" href="/next/{{ room.room }}">»</a>
             <a class="button small" href="/volume_up/{{ room.room }}">+</a>
         </div>

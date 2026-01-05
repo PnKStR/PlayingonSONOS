@@ -1,0 +1,11 @@
+version: "0.0.2"
+
+services:
+  sonos-dashboard:
+    build: .
+    container_name: playingonsonos
+    ports:
+      - "5008:5008"
+    restart: unless-stopped
+    volumes:
+      - .:/app
