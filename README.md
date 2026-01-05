@@ -22,6 +22,9 @@ chmod +x install.sh
 
 curl -s https://raw.githubusercontent.com/PnKStR/PlayingonSONOS/main/install.sh | bash
 
+# or Installation
+git clone https://github.com/PnKStR/PlayingonSONOS.git
+cd PlayingonSONOS
 
 # Start the App
 python3 app.py
