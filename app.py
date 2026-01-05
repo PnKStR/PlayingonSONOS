@@ -104,6 +104,27 @@ def toggle(room):
 
     return redirect(url_for("index"))
 
+# --- Neue Buttons ---
+@app.route("/next/<room>")
+def next_track(room):
+    requests.get(f"{SERVER}{room}/next")
+    return redirect(url_for("index"))
+
+@app.route("/previous/<room>")
+def previous_track(room):
+    requests.get(f"{SERVER}{room}/previous")
+    return redirect(url_for("index"))
+
+@app.route("/volume_up/<room>")
+def volume_up(room):
+    requests.get(f"{SERVER}{room}/volume/+5")
+    return redirect(url_for("index"))
+
+@app.route("/volume_down/<room>")
+def volume_down(room):
+    requests.get(f"{SERVER}{room}/volume/-5")
+    return redirect(url_for("index"))
+
 @app.route("/api/state")
 def api_state():
     states = [get_room_state(room) for room in ROOMS]
