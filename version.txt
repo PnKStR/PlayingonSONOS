@@ -8,4 +8,5 @@
     See which room is stil playing
 0.0.4
     admin area with login to add or remove rooms and alias names
+    rename app.py in planingonsonos.py 
 

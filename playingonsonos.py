@@ -1,16 +1,19 @@
+#!/usr/bin/env python3
 from flask import Flask, render_template, redirect, url_for, jsonify, request, session
 import requests
 import json
+import os
 
 app = Flask(__name__)
 app.secret_key = "change_this_secret_key"
 
 # Load config
-with open("config.json", "r") as f:
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
+with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     CONFIG = json.load(f)
 
 SERVER = CONFIG["server"]
-ROOMS = CONFIG["rooms"]          # Liste von Objekten: {name, alias}
+ROOMS = CONFIG["rooms"]          # Liste von Objekten: { "name", "alias" }
 DEBUG = CONFIG.get("debug", False)
 
 DISPLAY_WIDTH = CONFIG.get("display_width", 720)
@@ -18,22 +21,28 @@ DISPLAY_HEIGHT = CONFIG.get("display_height", 720)
 
 COVER_SIZE = int(min(DISPLAY_WIDTH, DISPLAY_HEIGHT) * 0.5)
 
-with open("appinfo.json", "r") as f:
-    APPINFO = json.load(f)
+# Optional: appinfo.json (falls vorhanden)
+APPINFO_PATH = os.path.join(os.path.dirname(__file__), "appinfo.json")
+if os.path.exists(APPINFO_PATH):
+    with open(APPINFO_PATH, "r", encoding="utf-8") as f:
+        APPINFO = json.load(f)
+else:
+    APPINFO = {"app_name": "Playing on SONOS", "version": "0.0", "author": "unknown"}
 
 LAST_STATE = {}
 
-# Active room = Name des ersten Raums
-ACTIVE_ROOM = ROOMS[0]["name"]
+# Active room = Name des ersten Raums (falls vorhanden)
+ACTIVE_ROOM = ROOMS[0]["name"] if ROOMS else None
 
 
 def get_room_state(room_obj):
     room = room_obj["name"]
-    alias = room_obj["alias"]
+    alias = room_obj.get("alias", room)
     url = f"{SERVER}{room}/state"
 
     try:
-        data = requests.get(url, timeout=2).json()
+        resp = requests.get(url, timeout=2)
+        data = resp.json() if resp.status_code == 200 else {}
     except Exception:
         old = LAST_STATE.get(room, {})
         return {
@@ -48,7 +57,7 @@ def get_room_state(room_obj):
             "state": old.get("state", "unknown")
         }
 
-    track = data.get("currentTrack", {})
+    track = data.get("currentTrack", {}) or {}
     state = data.get("playbackState", "unknown")
 
     position = data.get("elapsedTime", 0) or 0
@@ -96,7 +105,6 @@ def index():
 @app.route("/setroom/<room>")
 def set_room(room):
     global ACTIVE_ROOM
-    # Prüfen, ob Raum existiert
     if any(r["name"] == room for r in ROOMS):
         ACTIVE_ROOM = room
     return redirect(url_for("index"))
@@ -105,41 +113,65 @@ def set_room(room):
 @app.route("/toggle")
 def toggle():
     room = ACTIVE_ROOM
+    if not room:
+        return redirect(url_for("index"))
     try:
         data = requests.get(f"{SERVER}{room}/state", timeout=2).json()
         state = data.get("playbackState", "unknown")
-    except:
+    except Exception:
         state = "unknown"
 
     if state == "PLAYING":
-        requests.get(f"{SERVER}{room}/pause")
+        try:
+            requests.get(f"{SERVER}{room}/pause")
+        except Exception:
+            pass
     else:
-        requests.get(f"{SERVER}{room}/play")
+        try:
+            requests.get(f"{SERVER}{room}/play")
+        except Exception:
+            pass
 
     return redirect(url_for("index"))
 
 
 @app.route("/next")
 def next_track():
-    requests.get(f"{SERVER}{ACTIVE_ROOM}/next")
+    if ACTIVE_ROOM:
+        try:
+            requests.get(f"{SERVER}{ACTIVE_ROOM}/next")
+        except Exception:
+            pass
     return redirect(url_for("index"))
 
 
 @app.route("/previous")
 def previous_track():
-    requests.get(f"{SERVER}{ACTIVE_ROOM}/previous")
+    if ACTIVE_ROOM:
+        try:
+            requests.get(f"{SERVER}{ACTIVE_ROOM}/previous")
+        except Exception:
+            pass
     return redirect(url_for("index"))
 
 
 @app.route("/volume_up")
 def volume_up():
-    requests.get(f"{SERVER}{ACTIVE_ROOM}/volume/+5")
+    if ACTIVE_ROOM:
+        try:
+            requests.get(f"{SERVER}{ACTIVE_ROOM}/volume/+5")
+        except Exception:
+            pass
     return redirect(url_for("index"))
 
 
 @app.route("/volume_down")
 def volume_down():
-    requests.get(f"{SERVER}{ACTIVE_ROOM}/volume/-5")
+    if ACTIVE_ROOM:
+        try:
+            requests.get(f"{SERVER}{ACTIVE_ROOM}/volume/-5")
+        except Exception:
+            pass
     return redirect(url_for("index"))
 
 
@@ -158,7 +190,8 @@ def login():
         user = request.form.get("username")
         pw = request.form.get("password")
 
-        if user == CONFIG["admin"]["username"] and pw == CONFIG["admin"]["password"]:
+        admin_cfg = CONFIG.get("admin", {})
+        if user == admin_cfg.get("username") and pw == admin_cfg.get("password"):
             session["logged_in"] = True
             return redirect("/admin")
 
@@ -187,7 +220,11 @@ def admin_save():
     new_rooms = []
 
     # Bestehende Räume bearbeiten
-    count = int(request.form.get("room_count", "0"))
+    try:
+        count = int(request.form.get("room_count", "0"))
+    except ValueError:
+        count = 0
+
     for i in range(1, count + 1):
         name = request.form.get(f"name_{i}", "").strip()
         alias = request.form.get(f"alias_{i}", "").strip()
@@ -215,11 +252,14 @@ def admin_save():
     CONFIG["rooms"] = new_rooms
     ROOMS = new_rooms
 
-    with open("config.json", "w") as f:
-        json.dump(CONFIG, f, indent=4)
+    # Persist config
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+        json.dump(CONFIG, f, indent=4, ensure_ascii=False)
 
     return redirect("/admin")
 
 
 if __name__ == "__main__":
+    # Optional: FLASK_APP compatibility
+    # To run: python playingonsonos.py
     app.run(host="0.0.0.0", port=5008, debug=DEBUG)
