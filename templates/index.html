@@ -3,140 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ appinfo.app_name }}</title>
-
     <link rel="icon" type="image/png" href="/static/icon.png">
 
+    <!-- Dynamische Werte als CSS-Variablen -->
     <style>
-        body {
-            background: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-
-            width: {{ display_width }}px;
-            height: {{ display_height }}px;
-            margin-left: auto;
-            margin-right: auto;
-
-            display: flex;
-            flex-direction: column;
-        }
-
-        .title-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-
-        .logo {
-            height: 40px;
-            width: auto;
-        }
-
-        h1 {
-            font-size: 30px;
-            margin: 0;
-            padding: 0;
-        }
-
-        .content {
-            flex: 1;
-            overflow: auto;
-        }
-
-        .room-frame {
-            border: 2px solid #444;
-            border-radius: 15px;
-            padding: 15px;
-            width: calc({{ display_width }}px - 60px);
-            margin: 0 auto;
-            margin-top: 5px;
-        }
-
-        img.cover {
-            width: {{ cover_size }}px;
-            height: {{ cover_size }}px;
-            border-radius: 12px;
-            object-fit: cover;
-        }
-
-        .control-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .control-row.room-buttons {
-            margin-bottom: 30px;
-        }
-
-        .button {
-            padding: 10px 18px;
-            background: #444;
-            color: white;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 20px;
-            min-width: 110px;
-        }
-
-        .button.small {
-            padding: 8px 14px;
-            font-size: 20px;
-            min-width: 50px;
-            text-align: center;
-        }
-
-        .active-room {
-            background: #00aa55;
-            font-weight: bold;
-        }
-
-        .playing-room {
-            border: 3px solid #ffffff;
-            box-shadow: 0 0 10px #ffffff;
-        }
-
-        .button.small,
-        .button.small.active-room,
-        .button.small.playing-room {
-            color: white !important;
-        }
-
-        .progress-container {
-            width: 100%;
-            max-width: calc({{ display_width }}px - 90px);
-            height: 18px;
-            margin: 0 auto;
-            background: #333;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: #00ff66;
-            width: 0%;
-            transition: width 0.3s linear;
-        }
-
-        .local-footer {
-            padding: 0 10px 5px 10px;
-            font-size: 12px;
-            color: #888;
-            text-align: right;
-            margin-top: 8px;
+        :root {
+            --display-width: {{ display_width }}px;
+            --display-height: {{ display_height }}px;
+            --cover-size: {{ cover_size }}px;
         }
     </style>
-</head>
 
+    <!-- Externes CSS (kein Jinja darin) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
 <body>
 
 <div class="title-row">
@@ -145,51 +25,51 @@
 </div>
 
 <div class="content">
+    <div class="room-frame">
+        <div class="room">
 
-<div class="room-frame">
-    <div class="room">
-
-        {% if rooms|length > 1 %}
-        <div class="control-row room-buttons">
-            {% for r in rooms %}
-                <a class="button small
-                          {% if r.room == active_room %}active-room{% endif %}
-                          {% if r.state == 'PLAYING' %}playing-room{% endif %}"
-                   href="/setroom/{{ r.room }}">
-                    {{ r.alias }}
-                </a>
-            {% endfor %}
-        </div>
-        {% else %}
-        <h2 id="roomname">{{ rooms[0].alias }}</h2>
-        {% endif %}
-
-        <img id="cover" class="cover" src="" alt="Cover">
-
-        <h3 id="title"></h3>
-        <h4 id="artist"></h4>
-
-        <div class="control-row">
-            <div class="progress-container">
-                <div id="progress" class="progress-bar"></div>
+            <!-- Raumwahl -->
+            {% if rooms|length > 1 %}
+            <div class="control-row room-buttons">
+                {% for r in rooms %}
+                    <a class="button small {% if r.room == active_room %}active-room{% endif %}{% if r.state == 'PLAYING' %} playing-room{% endif %}"
+                       href="/setroom/{{ r.room }}">
+                        {{ r.alias }}
+                    </a>
+                {% endfor %}
             </div>
-        </div>
+            {% else %}
+            <h2 id="roomname">{{ rooms[0].alias }}</h2>
+            {% endif %}
 
-        <div class="control-row">
-            <a class="button small" href="/volume_down">−</a>
-            <a class="button small" href="/previous">«</a>
-            <a id="togglebtn" class="button small" href="/toggle">Play</a>
-            <a class="button small" href="/next">»</a>
-            <a class="button small" href="/volume_up">+</a>
-        </div>
+            <!-- Album Art -->
+            <img id="cover" class="cover" src="" alt="Cover">
 
+            <h3 id="title"></h3>
+            <h4 id="artist"></h4>
+
+            <!-- Statusbar -->
+            <div class="control-row">
+                <div class="progress-container">
+                    <div id="progress" class="progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="control-row">
+                <a class="button small" href="/volume_down">−</a>
+                <a class="button small" href="/previous">«</a>
+                <a id="togglebtn" class="button small" href="/toggle">Play</a>
+                <a class="button small" href="/next">»</a>
+                <a class="button small" href="/volume_up">+</a>
+            </div>
+
+        </div>
     </div>
-</div>
 
-<footer class="local-footer">
-    Version {{ appinfo.version }} — © {{ appinfo.author }}
-</footer>
-
+    <footer class="local-footer">
+        Version {{ appinfo.version }} — © {{ appinfo.author }}
+    </footer>
 </div>
 
 <script>
@@ -204,9 +84,9 @@ async function updateData() {
         const room = rooms.find(r => r.room === active);
         if (!room) return;
 
-        document.getElementById("title").innerText = room.title;
-        document.getElementById("artist").innerText = room.artist;
-        document.getElementById("cover").src = room.album_art;
+        document.getElementById("title").innerText = room.title || "";
+        document.getElementById("artist").innerText = room.artist || "";
+        document.getElementById("cover").src = room.album_art || "";
 
         const pct = room.duration > 0 ? (room.position / room.duration * 100) : 0;
         document.getElementById("progress").style.width = pct + "%";
@@ -219,6 +99,7 @@ async function updateData() {
     }
 }
 
+updateData();
 setInterval(updateData, 1000);
 </script>
 

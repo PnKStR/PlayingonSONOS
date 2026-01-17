@@ -1,0 +1,134 @@
+/* Grundlayout */
+body {
+    background: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    width: var(--display-width);
+    height: var(--display-height);
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
+h1 {
+    font-size: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    flex: 1;
+    overflow: auto;
+}
+
+.room-frame {
+    border: 2px solid #444;
+    border-radius: 15px;
+    padding: 15px;
+    width: calc(var(--display-width) - 60px);
+    margin: 0 auto;
+    margin-top: 5px;
+}
+
+img.cover {
+    width: var(--cover-size);
+    height: var(--cover-size);
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+/* Steuerzeilen */
+.control-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.control-row.room-buttons {
+    margin-bottom: 30px;
+}
+
+/* Buttons */
+.button {
+    padding: 10px 18px;
+    background: #444;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 20px;
+    min-width: 110px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button.small {
+    padding: 8px 14px;
+    font-size: 20px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.active-room {
+    background: #00aa55;
+    font-weight: bold;
+}
+
+/* Rahmen + Glow für spielende Räume (weiß) */
+.playing-room {
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 10px #ffffff;
+}
+
+/* Schriftfarbe immer weiß */
+.button.small,
+.button.small.active-room,
+.button.small.playing-room {
+    color: white !important;
+}
+
+/* Progressbar */
+.progress-container {
+    width: 100%;
+    max-width: calc(var(--display-width) - 90px);
+    height: 18px;
+    margin: 0 auto;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #00ff66;
+    width: 0%;
+    transition: width 0.3s linear;
+}
+
+.local-footer {
+    padding: 0 10px 5px 10px;
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+    margin-top: 8px;
+}
