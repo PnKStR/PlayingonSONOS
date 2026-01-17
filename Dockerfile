@@ -21,4 +21,4 @@ COPY . .
 EXPOSE 5008
 
 # 8. Startkommando
-CMD ["python", "app.py"]
+CMD ["python", "playingonsonos.py"]
