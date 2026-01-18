@@ -26,6 +26,7 @@
     <div class="room-frame">
         <div class="room">
 
+            <!-- Raumwahl -->
             {% if rooms|length > 1 %}
             <div class="control-row room-buttons">
                 {% for r in rooms %}
@@ -39,23 +40,26 @@
             <h2 id="roomname">{{ rooms[0].alias }}</h2>
             {% endif %}
 
+            <!-- Album Art -->
             <img id="cover" class="cover" src="" alt="Cover">
 
             <h3 id="title"></h3>
             <h4 id="artist"></h4>
 
+            <!-- Statusbar -->
             <div class="control-row">
                 <div class="progress-container">
                     <div id="progress" class="progress-bar"></div>
                 </div>
             </div>
 
+            <!-- Steuerungsbuttons (jetzt doppelt so groß) -->
             <div class="control-row">
-                <a class="button small" href="/volume_down">−</a>
-                <a class="button small" href="/previous">«</a>
-                <a id="togglebtn" class="button small" href="/toggle">Play</a>
-                <a class="button small" href="/next">»</a>
-                <a class="button small" href="/volume_up">+</a>
+                <a class="button small control-btn" href="/volume_down">−</a>
+                <a class="button small control-btn" href="/previous">«</a>
+                <a id="togglebtn" class="button small control-btn" href="/toggle">Play</a>
+                <a class="button small control-btn" href="/next">»</a>
+                <a class="button small control-btn" href="/volume_up">+</a>
             </div>
 
         </div>

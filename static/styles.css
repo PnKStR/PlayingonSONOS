@@ -7,7 +7,7 @@ body {
     padding: 0;
     text-align: center;
     width: var(--display-width);
-    min-height: var(--display-height); /* FIX: statt height */
+    min-height: var(--display-height);
     margin-left: auto;
     margin-right: auto;
     display: flex;
@@ -64,29 +64,36 @@ img.cover {
     margin-top: 15px;
 }
 
+/* Raum-Buttons – textbasiert */
 .control-row.room-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 14px;
     margin-bottom: 30px;
 }
 
-/* Buttons */
+/* Grundstil für alle Buttons */
 .button {
-    padding: 10px 18px;
     background: #444;
     color: white;
     border-radius: 10px;
     text-decoration: none;
-    font-size: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 10px 18px;
+    font-size: 20px;
 }
 
-/* Raum-Buttons (small) – angepasst */
+/* Raum-Buttons kompakt & textbasiert */
 .button.small {
     padding: 6px 12px;
-    font-size: 14px;   /* kompakter */
-    min-width: auto;   /* passt sich wieder an Text an */
+    font-size: 20px;
+    min-width: auto;
+    width: auto;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .active-room {
@@ -94,17 +101,24 @@ img.cover {
     font-weight: bold;
 }
 
-/* Rahmen + Glow für spielende Räume (weiß) */
 .playing-room {
     border: 3px solid #ffffff;
     box-shadow: 0 0 10px #ffffff;
 }
 
-/* Schriftfarbe immer weiß */
 .button.small,
 .button.small.active-room,
 .button.small.playing-room {
     color: white !important;
+}
+
+/* Steuerungsbuttons – Schrift jetzt wirklich größer */
+.button.control-btn {
+    padding: 8px 14px;
+    font-size: 28px;      /* HIER wirkt es jetzt garantiert */
+    min-width: 50px;
+    border-radius: 10px;
+    background: #444;
 }
 
 /* Progressbar */
@@ -125,11 +139,11 @@ img.cover {
     transition: width 0.3s linear;
 }
 
-/* Einheitliche Fußzeile – rechtsbündig & etwas höher */
+/* Footer */
 .footer {
     text-align: right;
     color: #888;
     font-size: 14px;
     padding: 0 15px 10px 0;
-    margin-top: 20px;
+    margin-top: 1px;
 }
