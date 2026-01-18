@@ -63,20 +63,22 @@
 <form action="/admin/save" method="POST">
     <h2>Bestehende Räume</h2>
 
-    {% set idx = 0 %}
     {% for r in rooms %}
-        {% set idx = idx + 1 %}
         <div class="room-row">
-            <label>Raum {{ idx }}:</label>
-            <input type="text" name="name_{{ idx }}" value="{{ r.name }}" placeholder="Raumname (Sonos)">
-            <input type="text" name="alias_{{ idx }}" value="{{ r.alias }}" placeholder="Alias (Anzeige)">
+            <label>Raum {{ loop.index }}:</label>
+
+            <input type="text" name="name_{{ loop.index }}" value="{{ r.name }}" placeholder="Raumname (Sonos)">
+            <input type="text" name="alias_{{ loop.index }}" value="{{ r.alias }}" placeholder="Alias (Anzeige)">
+
+            <input type="hidden" name="old_name_{{ loop.index }}" value="{{ r.name }}">
+
             <label class="delete-label">
-                <input type="checkbox" name="delete_{{ idx }}"> löschen
+                <input type="checkbox" name="delete_{{ loop.index }}"> löschen
             </label>
         </div>
     {% endfor %}
 
-    <input type="hidden" name="room_count" value="{{ idx }}">
+    <input type="hidden" name="room_count" value="{{ rooms|length }}">
 
     <h2>Neuen Raum hinzufügen</h2>
     <div class="room-row">

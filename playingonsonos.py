@@ -7,22 +7,23 @@ import os
 app = Flask(__name__)
 app.secret_key = "change_this_secret_key"
 
-# Load config
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
-with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-    CONFIG = json.load(f)
+BASE_DIR = os.path.dirname(__file__)
+CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
 
+def load_config():
+    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+CONFIG = load_config()
 SERVER = CONFIG["server"]
-ROOMS = CONFIG["rooms"]          # Liste von Objekten: { "name", "alias" }
+ROOMS = CONFIG["rooms"]
 DEBUG = CONFIG.get("debug", False)
 
 DISPLAY_WIDTH = CONFIG.get("display_width", 720)
 DISPLAY_HEIGHT = CONFIG.get("display_height", 720)
-
 COVER_SIZE = int(min(DISPLAY_WIDTH, DISPLAY_HEIGHT) * 0.5)
 
-# Optional: appinfo.json (falls vorhanden)
-APPINFO_PATH = os.path.join(os.path.dirname(__file__), "appinfo.json")
+APPINFO_PATH = os.path.join(BASE_DIR, "appinfo.json")
 if os.path.exists(APPINFO_PATH):
     with open(APPINFO_PATH, "r", encoding="utf-8") as f:
         APPINFO = json.load(f)
@@ -30,8 +31,6 @@ else:
     APPINFO = {"app_name": "Playing on SONOS", "version": "0.0", "author": "unknown"}
 
 LAST_STATE = {}
-
-# Active room = Name des ersten Raums (falls vorhanden)
 ACTIVE_ROOM = ROOMS[0]["name"] if ROOMS else None
 
 
@@ -64,10 +63,15 @@ def get_room_state(room_obj):
     duration = track.get("duration", 0) or 0
     remaining = duration - position if duration > 0 else 0
 
+    # Titel filtern (Radio liefert oft ZPSTR_…)
+    title = track.get("title", LAST_STATE.get(room, {}).get("title", "—"))
+    if isinstance(title, str) and title.startswith("ZPSTR_"):
+        title = "Radio lädt…"
+
     LAST_STATE[room] = {
         "room": room,
         "alias": alias,
-        "title": track.get("title", LAST_STATE.get(room, {}).get("title", "—")),
+        "title": title,
         "artist": track.get("artist", LAST_STATE.get(room, {}).get("artist", "—")),
         "album_art": track.get("absoluteAlbumArtUri", LAST_STATE.get(room, {}).get("album_art", "")),
         "position": position,
@@ -115,22 +119,20 @@ def toggle():
     room = ACTIVE_ROOM
     if not room:
         return redirect(url_for("index"))
+
     try:
         data = requests.get(f"{SERVER}{room}/state", timeout=2).json()
         state = data.get("playbackState", "unknown")
     except Exception:
         state = "unknown"
 
-    if state == "PLAYING":
-        try:
+    try:
+        if state == "PLAYING":
             requests.get(f"{SERVER}{room}/pause")
-        except Exception:
-            pass
-    else:
-        try:
+        else:
             requests.get(f"{SERVER}{room}/play")
-        except Exception:
-            pass
+    except Exception:
+        pass
 
     return redirect(url_for("index"))
 
@@ -219,7 +221,6 @@ def admin_save():
 
     new_rooms = []
 
-    # Bestehende Räume bearbeiten
     try:
         count = int(request.form.get("room_count", "0"))
     except ValueError:
@@ -230,19 +231,25 @@ def admin_save():
         alias = request.form.get(f"alias_{i}", "").strip()
         delete_flag = request.form.get(f"delete_{i}", "") == "on"
 
-        if not name:
-            continue
+        old_name = request.form.get(f"old_name_{i}", "").strip()
+
         if delete_flag:
             continue
 
+        if not name:
+            name = old_name
+
+        if not alias:
+            alias = name
+
         new_rooms.append({
             "name": name,
-            "alias": alias or name
+            "alias": alias
         })
 
-    # Neuen Raum hinzufügen
     new_name = request.form.get("new_name", "").strip()
     new_alias = request.form.get("new_alias", "").strip()
+
     if new_name:
         new_rooms.append({
             "name": new_name,
@@ -252,7 +259,6 @@ def admin_save():
     CONFIG["rooms"] = new_rooms
     ROOMS = new_rooms
 
-    # Persist config
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(CONFIG, f, indent=4, ensure_ascii=False)
 
@@ -260,6 +266,4 @@ def admin_save():
 
 
 if __name__ == "__main__":
-    # Optional: FLASK_APP compatibility
-    # To run: python playingonsonos.py
     app.run(host="0.0.0.0", port=5008, debug=DEBUG)
