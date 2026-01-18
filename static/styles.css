@@ -7,7 +7,7 @@ body {
     padding: 0;
     text-align: center;
     width: var(--display-width);
-    height: var(--display-height);
+    min-height: var(--display-height); /* FIX: statt height */
     margin-left: auto;
     margin-right: auto;
     display: flex;
@@ -125,10 +125,11 @@ img.cover {
     transition: width 0.3s linear;
 }
 
-.local-footer {
-    padding: 0 10px 5px 10px;
-    font-size: 12px;
+/* Einheitliche Fußzeile */
+.footer {
+    text-align: center;
     color: #888;
-    text-align: right;
-    margin-top: 8px;
+    font-size: 14px;
+    padding: 10px 0;
+    margin-top: 10px;
 }

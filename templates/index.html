@@ -5,7 +5,6 @@
     <title>{{ appinfo.app_name }}</title>
     <link rel="icon" type="image/png" href="/static/icon.png">
 
-    <!-- Dynamische Werte als CSS-Variablen -->
     <style>
         :root {
             --display-width: {{ display_width }}px;
@@ -14,7 +13,6 @@
         }
     </style>
 
-    <!-- Externes CSS (kein Jinja darin) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -28,7 +26,6 @@
     <div class="room-frame">
         <div class="room">
 
-            <!-- Raumwahl -->
             {% if rooms|length > 1 %}
             <div class="control-row room-buttons">
                 {% for r in rooms %}
@@ -42,20 +39,17 @@
             <h2 id="roomname">{{ rooms[0].alias }}</h2>
             {% endif %}
 
-            <!-- Album Art -->
             <img id="cover" class="cover" src="" alt="Cover">
 
             <h3 id="title"></h3>
             <h4 id="artist"></h4>
 
-            <!-- Statusbar -->
             <div class="control-row">
                 <div class="progress-container">
                     <div id="progress" class="progress-bar"></div>
                 </div>
             </div>
 
-            <!-- Buttons -->
             <div class="control-row">
                 <a class="button small" href="/volume_down">−</a>
                 <a class="button small" href="/previous">«</a>
@@ -67,9 +61,10 @@
         </div>
     </div>
 
-    <footer class="local-footer">
-        Version {{ appinfo.version }} — © {{ appinfo.author }}
-    </footer>
+    <!-- Einheitliche Fußzeile -->
+    <div class="footer">
+        <p>{{ appinfo.app_name }} – Version {{ appinfo.version }}</p>
+    </div>
 </div>
 
 <script>

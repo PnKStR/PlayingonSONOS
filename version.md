@@ -18,3 +18,6 @@
 ## 0.0.5
     - Title code handling for radiostations (e.g. ZPSTR_BUFFERING, ZPSTR_CONNECTING, ZPSTR_PLAYBACK_BUFFERING, ZPSTR_TRANSCODING, ZPSTR_UNKNOWN)
 
+## 0.0.6
+    - Change Sonos Server adress and display size in the admin area.
+

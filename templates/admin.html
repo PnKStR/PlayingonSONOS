@@ -2,7 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Admin – Räume</title>
+    <title>Admin – Einstellungen</title>
+    <link rel="icon" type="image/png" href="/static/icon.png">
     <style>
         body {
             background: black;
@@ -14,29 +15,29 @@
         h1 {
             margin-top: 0;
         }
-        .room-row {
+        .row {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         input[type="text"] {
             padding: 6px 8px;
             border-radius: 6px;
             border: none;
-            min-width: 180px;
+            min-width: 200px;
         }
         label {
-            min-width: 80px;
+            min-width: 150px;
         }
         button {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 8px;
             border: none;
             background: #00aa55;
             color: black;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 20px;
         }
         .delete-label {
             font-size: 12px;
@@ -51,20 +52,40 @@
             color: #00ffcc;
             text-decoration: none;
         }
+        hr {
+            border: 0;
+            border-top: 1px solid #444;
+            margin: 20px 0;
+        }
+        .logo {
+            height: 32px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
 
 <div class="top-bar">
-    <h1>Admin – Räume verwalten</h1>
+    <h1>
+        <img src="/static/icon.png" class="logo">
+        Admin – Einstellungen
+    </h1>
     <a href="/logout">Logout</a>
 </div>
 
 <form action="/admin/save" method="POST">
+
     <h2>Bestehende Räume</h2>
 
     {% for r in rooms %}
-        <div class="room-row">
+        <div class="row">
             <label>Raum {{ loop.index }}:</label>
 
             <input type="text" name="name_{{ loop.index }}" value="{{ r.name }}" placeholder="Raumname (Sonos)">
@@ -81,14 +102,51 @@
     <input type="hidden" name="room_count" value="{{ rooms|length }}">
 
     <h2>Neuen Raum hinzufügen</h2>
-    <div class="room-row">
+    <div class="row">
         <label>Neu:</label>
         <input type="text" name="new_name" placeholder="Raumname (Sonos)">
         <input type="text" name="new_alias" placeholder="Alias (Anzeige)">
     </div>
 
+    <hr>
+
+    <h2>System‑Einstellungen</h2>
+
+    <div class="row">
+        <label>Server‑Adresse:</label>
+        <input type="text" name="server" value="{{ server }}" placeholder="http://192.168.x.x:5005/">
+    </div>
+
+    <div class="row">
+        <label>Display‑Breite:</label>
+        <input type="text" name="display_width" value="{{ display_width }}" placeholder="z.B. 720">
+    </div>
+
+    <div class="row">
+        <label>Display‑Höhe:</label>
+        <input type="text" name="display_height" value="{{ display_height }}" placeholder="z.B. 720">
+    </div>
+
+    <hr>
+
+    <h2>Admin‑Zugang</h2>
+
+    <div class="row">
+        <label>Benutzername:</label>
+        <input type="text" name="admin_username" value="{{ admin_username }}" placeholder="Admin Benutzername">
+    </div>
+
+    <div class="row">
+        <label>Passwort:</label>
+        <input type="text" name="admin_password" value="{{ admin_password }}" placeholder="Admin Passwort">
+    </div>
+
     <button type="submit">Speichern</button>
 </form>
+
+<div class="footer">
+    <p>{{ appinfo.app_name }} – Version {{ appinfo.version }}</p>
+</div>
 
 </body>
 </html>

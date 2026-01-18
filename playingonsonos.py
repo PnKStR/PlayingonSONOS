@@ -63,7 +63,6 @@ def get_room_state(room_obj):
     duration = track.get("duration", 0) or 0
     remaining = duration - position if duration > 0 else 0
 
-    # Titel filtern (Radio liefert oft ZPSTR_…)
     title = track.get("title", LAST_STATE.get(room, {}).get("title", "—"))
     if isinstance(title, str) and title.startswith("ZPSTR_"):
         title = "Radio lädt…"
@@ -197,9 +196,9 @@ def login():
             session["logged_in"] = True
             return redirect("/admin")
 
-        return render_template("login.html", error="Falsche Zugangsdaten")
+        return render_template("login.html", error="Falsche Zugangsdaten", appinfo=APPINFO)
 
-    return render_template("login.html")
+    return render_template("login.html", appinfo=APPINFO)
 
 
 @app.route("/logout")
@@ -211,13 +210,23 @@ def logout():
 @app.route("/admin")
 @login_required
 def admin():
-    return render_template("admin.html", rooms=ROOMS)
+    admin_cfg = CONFIG.get("admin", {})
+    return render_template(
+        "admin.html",
+        rooms=ROOMS,
+        server=SERVER,
+        display_width=DISPLAY_WIDTH,
+        display_height=DISPLAY_HEIGHT,
+        admin_username=admin_cfg.get("username", ""),
+        admin_password=admin_cfg.get("password", ""),
+        appinfo=APPINFO
+    )
 
 
 @app.route("/admin/save", methods=["POST"])
 @login_required
 def admin_save():
-    global CONFIG, ROOMS
+    global CONFIG, ROOMS, SERVER, DISPLAY_WIDTH, DISPLAY_HEIGHT
 
     new_rooms = []
 
@@ -258,6 +267,36 @@ def admin_save():
 
     CONFIG["rooms"] = new_rooms
     ROOMS = new_rooms
+
+    # System‑Einstellungen speichern
+    new_server = request.form.get("server", "").strip()
+    new_width = request.form.get("display_width", "").strip()
+    new_height = request.form.get("display_height", "").strip()
+
+    if new_server:
+        CONFIG["server"] = new_server
+        SERVER = new_server
+
+    if new_width.isdigit():
+        CONFIG["display_width"] = int(new_width)
+        DISPLAY_WIDTH = int(new_width)
+
+    if new_height.isdigit():
+        CONFIG["display_height"] = int(new_height)
+        DISPLAY_HEIGHT = int(new_height)
+
+    # Admin‑Zugang speichern
+    new_admin_user = request.form.get("admin_username", "").strip()
+    new_admin_pass = request.form.get("admin_password", "").strip()
+
+    if "admin" not in CONFIG:
+        CONFIG["admin"] = {}
+
+    if new_admin_user:
+        CONFIG["admin"]["username"] = new_admin_user
+
+    if new_admin_pass:
+        CONFIG["admin"]["password"] = new_admin_pass
 
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(CONFIG, f, indent=4, ensure_ascii=False)
