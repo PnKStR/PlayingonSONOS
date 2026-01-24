@@ -34,10 +34,6 @@ LAST_STATE = {}
 ACTIVE_ROOM = ROOMS[0]["name"] if ROOMS else None
 
 
-# ---------------------------------------------------------
-# SONOS STATE HANDLING
-# ---------------------------------------------------------
-
 def get_room_state(room_obj):
     room = room_obj["name"]
     alias = room_obj.get("alias", room)
@@ -86,10 +82,6 @@ def get_room_state(room_obj):
     return LAST_STATE[room]
 
 
-# ---------------------------------------------------------
-# LOGIN HANDLING
-# ---------------------------------------------------------
-
 def login_required(f):
     def wrapper(*args, **kwargs):
         if not session.get("logged_in"):
@@ -98,10 +90,6 @@ def login_required(f):
     wrapper.__name__ = f.__name__
     return wrapper
 
-
-# ---------------------------------------------------------
-# ROUTES
-# ---------------------------------------------------------
 
 @app.route("/")
 def index():
@@ -280,6 +268,7 @@ def admin_save():
     CONFIG["rooms"] = new_rooms
     ROOMS = new_rooms
 
+    # System‑Einstellungen speichern
     new_server = request.form.get("server", "").strip()
     new_width = request.form.get("display_width", "").strip()
     new_height = request.form.get("display_height", "").strip()
@@ -296,6 +285,7 @@ def admin_save():
         CONFIG["display_height"] = int(new_height)
         DISPLAY_HEIGHT = int(new_height)
 
+    # Admin‑Zugang speichern
     new_admin_user = request.form.get("admin_username", "").strip()
     new_admin_pass = request.form.get("admin_password", "").strip()
 
@@ -314,14 +304,5 @@ def admin_save():
     return redirect("/admin")
 
 
-# ---------------------------------------------------------
-# BACKEND START (NO GUI)
-# ---------------------------------------------------------
-
 if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=5008,
-        debug=DEBUG,
-        use_reloader=False
-    )
+    app.run(host="0.0.0.0", port=5008, debug=DEBUG)

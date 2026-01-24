@@ -5,11 +5,11 @@
     { "name": "Badezimmer", "alias": "Bad" },
     { "name": "Küche", "alias": "Küche" }
   ],
-    "display_width": 720,
-    "display_height": 720,
-    "debug": false,
-    "admin": {
-        "username": "admin",
-        "password": "admin"
-    }
+  "admin": {
+    "username": "admin",
+    "password": "admin"
+  },
+  "display_width": 720,
+  "display_height": 720,
+  "debug": false
 }

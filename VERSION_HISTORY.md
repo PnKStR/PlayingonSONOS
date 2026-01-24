@@ -22,6 +22,4 @@
     - Change Sonos Server adress and display size in the admin area.
     - Integrate Logos and footerinformation
 
-## 0.1.1
-    - App redesign to use pyqt5
     

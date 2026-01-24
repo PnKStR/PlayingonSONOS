@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Login</title>
+    <!-- Browser-Tab Icon -->
     <link rel="icon" type="image/png" href="/static/icon.png">
     <style>
         body {
@@ -30,25 +31,11 @@
         .error {
             color: #ff4444;
         }
-        .logo {
-            height: 32px;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        .footer {
-            text-align: center;
-            color: #888;
-            font-size: 14px;
-            margin-top: 60px;
-        }
     </style>
 </head>
 <body>
 
-<h2>
-    <img src="/static/icon.png" class="logo">
-    Admin Login
-</h2>
+<h2>Admin Login</h2>
 
 {% if error %}
 <p class="error">{{ error }}</p>
@@ -59,10 +46,6 @@
     <input type="password" name="password" placeholder="Passwort"><br>
     <button type="submit">Login</button>
 </form>
-
-<div class="footer">
-    <p>{{ appinfo.app_name }} – Version {{ appinfo.version }}</p>
-</div>
 
 </body>
 </html>
