@@ -5,7 +5,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtCore import QUrl
 
 def load_config():
-    with open("/app/config.json", "r", encoding="utf-8") as f:
+    with open("/app/backend/config.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
 def main():
