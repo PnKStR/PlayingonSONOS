@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: playingonsonos-backend
+    restart: unless-stopped
+    ports:
+      - "5008:5008"
+
+  frontend:
+    build:
+      context: .
+    container_name: playingonsonos-frontend
+    restart: unless-stopped
+    environment:
+      - DISPLAY=:0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix

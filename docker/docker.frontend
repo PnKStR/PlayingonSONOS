@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+# Systempakete für Qt, X11, WebEngine
+RUN apt-get update && apt-get install -y \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libxkbcommon-x11-0 \
+    libgl1 \
+    libnss3 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# PyQt5 + QtWebEngine installieren
+COPY requirements-frontend.txt .
+RUN pip install --no-cache-dir -r requirements-frontend.txt
+
+# GUI-Code kopieren
+COPY frontend/ .
+
+# Config vom Backend übernehmen
+COPY backend/config.json /app/config.json
+
+CMD ["python3", "gui.py"]

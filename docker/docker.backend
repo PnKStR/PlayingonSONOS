@@ -1,23 +1,20 @@
 FROM python:3.11-slim
 
-# Systempakete
+WORKDIR /app
+
+# Systempakete für Requests, SSL etc.
 RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Arbeitsverzeichnis
-WORKDIR /app
-
 # Requirements installieren
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-backend.txt .
+RUN pip install --no-cache-dir -r requirements-backend.txt
 
 # App-Code kopieren
-COPY . .
+COPY backend/ .
 
-# Flask-Port
 EXPOSE 5008
 
-# Startbefehl
 CMD ["python3", "playingonsonos.py"]
